@@ -1,0 +1,9 @@
+@use './tokens.scss';
+@use './sections.scss';
+@use './background.scss';
+
+// App shell
+.app-content {
+  position: relative;
+  z-index: 1;
+}

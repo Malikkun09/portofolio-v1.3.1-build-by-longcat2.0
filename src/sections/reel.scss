@@ -1,0 +1,297 @@
+// ── Cinematic Project Reel ───────────────────────────────────
+//
+// Default = static stacked cards (mobile, reduced-motion, no-JS).
+// Cinematic pin+scrub mode activates only on wide screens WITH motion OK.
+.reel {
+  position: relative;
+  background: linear-gradient(to bottom, var(--bg) 0%, var(--bg-01) 12%, var(--bg-01) 88%, var(--bg) 100%);
+}
+
+.reel-head {
+  padding-top: clamp(4rem, 9vh, 6rem);
+}
+
+.reel-stage {
+  position: relative;
+}
+
+.reel-panels {
+  display: grid;
+  gap: 1.4rem;
+  padding-block: clamp(2rem, 5vh, 3rem);
+  justify-items: center;
+}
+
+// Panel — floating OLED glass card
+.reel-panel {
+  width: min(1120px, 94vw);
+}
+
+@media (min-width: 861px) and (prefers-reduced-motion: no-preference) {
+  .reel-stage {
+    height: calc(100svh - var(--nav-h));
+    min-height: 560px;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+  }
+
+  .reel-panels {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    display: grid;
+    place-items: center;
+    gap: 0;
+  }
+
+  .reel-panel {
+    position: absolute;
+    will-change: transform, opacity, filter;
+  }
+
+  .reel-hud {
+    display: flex;
+  }
+}
+
+.reel-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+  gap: clamp(1.2rem, 2.6vw, 2.4rem);
+  align-items: stretch;
+  padding: clamp(1rem, 2vw, 1.6rem);
+
+  @media (max-width: 860px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.reel-media-wrap {
+  position: relative;
+  border-radius: 6px;
+  overflow: hidden;
+  background: var(--bg-02);
+  border: 1px solid var(--line);
+
+  img,
+  .reel-terminal {
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    object-fit: cover;
+    display: block;
+  }
+
+  .reel-hover-video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    transition: opacity 0.5s var(--ease-out);
+    pointer-events: none;
+  }
+
+  // Only swap to video once it reported it can play
+  &.video-live:hover .reel-hover-video {
+    opacity: 1;
+  }
+
+  &.video-live:hover .reel-media {
+    opacity: 0;
+  }
+}
+
+.reel-media {
+  filter: saturate(0.92);
+}
+
+// Terminal fallback (project #1 has no screenshot)
+.reel-terminal {
+  position: relative;
+  padding: clamp(1.2rem, 3vw, 2.2rem);
+  font-family: var(--font-mono);
+  font-size: clamp(0.72rem, 1.15vw, 0.92rem);
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  justify-content: center;
+
+  .rt-line {
+    color: var(--text-dim);
+
+    &::before {
+      content: '› ';
+      color: var(--text-faint);
+    }
+  }
+
+  .rt-ok {
+    color: var(--accent);
+  }
+
+  .rt-dim {
+    opacity: 0.55;
+  }
+
+  .rt-cursor {
+    color: var(--accent);
+    animation: caret-blink 1.1s steps(2, start) infinite;
+  }
+}
+
+.reel-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  justify-content: center;
+  padding-block: 0.5rem;
+}
+
+.reel-topline {
+  display: flex;
+  gap: 1.2rem;
+  font-size: var(--fs-micro);
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+
+  span:first-child {
+    color: var(--accent);
+  }
+}
+
+.reel-title {
+  font-size: clamp(1.6rem, 3vw, 2.4rem);
+  letter-spacing: -0.02em;
+}
+
+.reel-desc {
+  color: var(--text-dim);
+  font-size: 0.95rem;
+  max-width: 46ch;
+}
+
+.reel-tech {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.reel-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.9rem;
+  margin-top: 0.4rem;
+}
+
+.reel-status {
+  font-size: var(--fs-micro);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+
+  &::before {
+    content: '';
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 8px var(--accent-glow);
+  }
+}
+
+.reel-foot {
+  display: none;
+  justify-content: space-between;
+  padding: 0.8rem clamp(1rem, 2vw, 1.6rem) 1rem;
+  font-size: var(--fs-micro);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  border-top: 1px solid var(--line);
+
+  @media (max-width: 860px) {
+    display: flex;
+  }
+}
+
+// HUD — hidden in static mode, shown by the cinematic media query above
+.reel-hud {
+  display: none;
+  position: absolute;
+  left: 50%;
+  bottom: clamp(1.2rem, 4vh, 2.4rem);
+  transform: translateX(-50%);
+  z-index: 5;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.55rem 0.9rem;
+  background: var(--glass-strong);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+}
+
+.reel-nav-btn {
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  border: 1px solid var(--line-strong);
+  color: var(--text-dim);
+  transition: color 0.25s, border-color 0.25s, box-shadow 0.25s;
+
+  &:hover {
+    color: var(--accent);
+    border-color: var(--accent);
+    box-shadow: 0 0 14px -4px var(--accent-glow);
+  }
+}
+
+.reel-progress {
+  width: clamp(90px, 16vw, 180px);
+  height: 2px;
+  background: var(--line);
+  overflow: hidden;
+  border-radius: 2px;
+
+  > span {
+    display: block;
+    height: 100%;
+    width: 100%;
+    background: var(--accent);
+    box-shadow: 0 0 8px var(--accent-glow);
+    transform-origin: left center;
+    transform: scaleX(0);
+  }
+}
+
+.reel-count {
+  font-size: var(--fs-micro);
+  letter-spacing: 0.18em;
+  color: var(--text-dim);
+}
+
+@media (max-width: 860px) {
+  .reel-foot {
+    display: flex;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reel-foot {
+    display: flex;
+  }
+}
