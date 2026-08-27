@@ -7,3 +7,23 @@
   position: relative;
   z-index: 1;
 }
+
+// Navbar drops in first once the loader hands over (pure CSS — no extra JS).
+.app-content .nav {
+  transform: translateY(-100%);
+  opacity: 0;
+  transition: transform 0.8s var(--ease-out) 0.1s, opacity 0.6s ease 0.1s,
+    background 0.45s var(--ease-out), border-color 0.45s var(--ease-out);
+}
+
+.app-content[data-booted] .nav {
+  transform: none;
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-content .nav {
+    transform: none;
+    opacity: 1;
+  }
+}

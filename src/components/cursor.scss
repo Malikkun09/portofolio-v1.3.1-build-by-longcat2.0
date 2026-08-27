@@ -29,12 +29,12 @@
     background: rgba(0, 229, 160, 0.05);
   }
 
-  &[data-state='view'] {
+  &[data-state='view'],
+  &[data-state='open'] {
     border-color: var(--accent);
     background: rgba(0, 229, 160, 0.08);
 
     &::after {
-      content: 'view';
       position: absolute;
       inset: 0;
       display: grid;
@@ -47,6 +47,9 @@
       transform: scale(calc(1 / 2.6));
     }
   }
+
+  &[data-state='view']::after { content: 'view'; }
+  &[data-state='open']::after { content: 'open'; }
 }
 
 // Hide native cursor only when the custom one is live

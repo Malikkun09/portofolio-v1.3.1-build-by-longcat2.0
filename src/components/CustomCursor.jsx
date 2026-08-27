@@ -12,7 +12,9 @@ import './cursor.scss';
 export default function CustomCursor() {
   const dotRef = useRef(null);
   const ringRef = useRef(null);
-  const enabled = useMedia('(hover: hover) and (pointer: fine)');
+  const fine = useMedia('(hover: hover) and (pointer: fine)');
+  const reduced = useMedia('(prefers-reduced-motion: reduce)');
+  const enabled = fine && !reduced;
 
   useEffect(() => {
     if (!enabled) return;
@@ -44,6 +46,7 @@ export default function CustomCursor() {
       const el = e.target.closest?.('a, button, [data-cursor]');
       if (!el) return setState(1, '');
       if (el.dataset.cursor === 'view') return setState(2.6, 'view');
+      if (el.dataset.cursor === 'open') return setState(2.6, 'open');
       if (el.tagName === 'A' || el.tagName === 'BUTTON') return setState(1.7, 'link');
       setState(1, '');
     };

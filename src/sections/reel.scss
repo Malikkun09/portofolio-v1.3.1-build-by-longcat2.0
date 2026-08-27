@@ -1,7 +1,9 @@
 // ── Cinematic Project Reel ───────────────────────────────────
 //
-// Default = static stacked cards (mobile, reduced-motion, no-JS).
+// Default = static stacked landscape cards (mobile / reduced-motion / no-JS).
 // Cinematic pin+scrub mode activates only on wide screens WITH motion OK.
+// Media keeps its native 3:2 landscape ratio in BOTH modes — never cropped
+// to portrait, never object-fit:cover'd into a taller box.
 .reel {
   position: relative;
   background: linear-gradient(to bottom, var(--bg) 0%, var(--bg-01) 12%, var(--bg-01) 88%, var(--bg) 100%);
@@ -17,20 +19,19 @@
 
 .reel-panels {
   display: grid;
-  gap: 1.4rem;
+  gap: 1.6rem;
   padding-block: clamp(2rem, 5vh, 3rem);
   justify-items: center;
 }
 
-// Panel — floating OLED glass card
 .reel-panel {
-  width: min(1120px, 94vw);
+  width: min(1180px, 94vw);
 }
 
 @media (min-width: 861px) and (prefers-reduced-motion: no-preference) {
   .reel-stage {
     height: calc(100svh - var(--nav-h));
-    min-height: 560px;
+    min-height: 620px;
     display: flex;
     align-items: center;
     overflow: hidden;
@@ -48,6 +49,19 @@
 
   .reel-panel {
     position: absolute;
+    opacity: 0;
+    visibility: hidden;
+    // Six stacked backdrop-filter layers is the single most expensive thing
+    // on the page while scrubbing. In cinematic mode the panels sit over flat
+    // OLED black anyway, so a solid surface is visually equivalent and cheap.
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    background: #060606;
+  }
+
+  // Promote to its own layer only while the reel is actually on screen —
+  // a permanent will-change keeps six large layers alive for the whole page.
+  .reel.is-active .reel-panel {
     will-change: transform, opacity, filter;
   }
 
@@ -58,66 +72,82 @@
 
 .reel-grid {
   display: grid;
-  grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
-  gap: clamp(1.2rem, 2.6vw, 2.4rem);
-  align-items: stretch;
-  padding: clamp(1rem, 2vw, 1.6rem);
+  // Media dominant: it is the showcase, copy supports it.
+  grid-template-columns: minmax(0, 8fr) minmax(0, 4.4fr);
+  gap: clamp(1.2rem, 2.4vw, 2.2rem);
+  align-items: center;
+  padding: clamp(1rem, 1.8vw, 1.5rem);
 
-  @media (max-width: 860px) {
+  @media (max-width: 1100px) {
     grid-template-columns: 1fr;
   }
 }
 
+// Landscape media frame — native 3:2, contained so nothing is cut off.
 .reel-media-wrap {
   position: relative;
   border-radius: 6px;
   overflow: hidden;
-  background: var(--bg-02);
+  background: #000;
   border: 1px solid var(--line);
+  transition: border-color 0.4s var(--ease-out), box-shadow 0.5s var(--ease-out);
 
-  img,
-  .reel-terminal {
-    width: 100%;
-    aspect-ratio: 16 / 10;
-    object-fit: cover;
-    display: block;
-  }
-
-  .reel-hover-video {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    opacity: 0;
-    transition: opacity 0.5s var(--ease-out);
-    pointer-events: none;
-  }
-
-  // Only swap to video once it reported it can play
-  &.video-live:hover .reel-hover-video {
-    opacity: 1;
-  }
-
-  &.video-live:hover .reel-media {
-    opacity: 0;
+  &:hover {
+    border-color: rgba(0, 229, 160, 0.4);
+    box-shadow: 0 0 40px -12px var(--accent-glow);
   }
 }
 
 .reel-media {
-  filter: saturate(0.92);
+  display: block;
+  position: relative;
+  width: 100%;
+  aspect-ratio: 3 / 2;
+  overflow: hidden;
 }
 
-// Terminal fallback (project #1 has no screenshot)
-.reel-terminal {
-  position: relative;
-  padding: clamp(1.2rem, 3vw, 2.2rem);
+// Inner layer is what parallaxes / breathes, so the frame stays put.
+.reel-media-inner {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+  filter: saturate(0.94);
+  transition: filter 0.5s var(--ease-out);
+  will-change: transform;
+}
+
+.reel-media-wrap:hover .reel-media-inner {
+  filter: saturate(1.02);
+}
+
+.reel-hover-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: #000;
+  opacity: 0;
+  transition: opacity 0.5s var(--ease-out);
+  pointer-events: none;
+}
+
+.reel-media-wrap.video-live:hover {
+  .reel-hover-video { opacity: 1; }
+  img.reel-media-inner { opacity: 0; }
+}
+
+// Terminal fallback (project #1 has no screenshot — real repo output)
+.reel-terminal .reel-media-inner {
+  padding: clamp(1.2rem, 3vw, 2.4rem);
   font-family: var(--font-mono);
-  font-size: clamp(0.72rem, 1.15vw, 0.92rem);
+  font-size: clamp(0.72rem, 1.05vw, 0.9rem);
   display: flex;
   flex-direction: column;
-  gap: 0.55rem;
+  gap: 0.6rem;
   justify-content: center;
+  object-fit: initial;
 
   .rt-line {
     color: var(--text-dim);
@@ -128,13 +158,8 @@
     }
   }
 
-  .rt-ok {
-    color: var(--accent);
-  }
-
-  .rt-dim {
-    opacity: 0.55;
-  }
+  .rt-ok { color: var(--accent); }
+  .rt-dim { opacity: 0.55; }
 
   .rt-cursor {
     color: var(--accent);
@@ -145,7 +170,7 @@
 .reel-copy {
   display: flex;
   flex-direction: column;
-  gap: 0.9rem;
+  gap: 0.85rem;
   justify-content: center;
   padding-block: 0.5rem;
 }
@@ -158,20 +183,18 @@
   text-transform: uppercase;
   color: var(--text-faint);
 
-  span:first-child {
-    color: var(--accent);
-  }
+  span:first-child { color: var(--accent); }
 }
 
 .reel-title {
-  font-size: clamp(1.6rem, 3vw, 2.4rem);
+  font-size: clamp(1.5rem, 2.6vw, 2.2rem);
   letter-spacing: -0.02em;
 }
 
 .reel-desc {
   color: var(--text-dim);
-  font-size: 0.95rem;
-  max-width: 46ch;
+  font-size: 0.92rem;
+  max-width: 42ch;
 }
 
 .reel-tech {
@@ -219,18 +242,14 @@
   text-transform: uppercase;
   color: var(--text-faint);
   border-top: 1px solid var(--line);
-
-  @media (max-width: 860px) {
-    display: flex;
-  }
 }
 
-// HUD — hidden in static mode, shown by the cinematic media query above
+// HUD — shown only in cinematic mode
 .reel-hud {
   display: none;
   position: absolute;
   left: 50%;
-  bottom: clamp(1.2rem, 4vh, 2.4rem);
+  bottom: clamp(1rem, 3.4vh, 2rem);
   transform: translateX(-50%);
   z-index: 5;
   align-items: center;
@@ -251,13 +270,17 @@
   border-radius: 50%;
   border: 1px solid var(--line-strong);
   color: var(--text-dim);
-  transition: color 0.25s, border-color 0.25s, box-shadow 0.25s;
+  transition: color 0.25s, border-color 0.25s, box-shadow 0.25s, transform 0.25s var(--ease-out);
 
   &:hover {
     color: var(--accent);
     border-color: var(--accent);
     box-shadow: 0 0 14px -4px var(--accent-glow);
   }
+
+  &:first-of-type:hover { transform: translateX(-2px); }
+  &:nth-of-type(2):hover { transform: translateX(2px); }
+  &:active { transform: scale(0.92); }
 }
 
 .reel-progress {
@@ -282,16 +305,15 @@
   font-size: var(--fs-micro);
   letter-spacing: 0.18em;
   color: var(--text-dim);
+  font-variant-numeric: tabular-nums;
 }
 
+// Static / stacked mode gets the per-card footer instead of the HUD
 @media (max-width: 860px) {
-  .reel-foot {
-    display: flex;
-  }
+  .reel-foot { display: flex; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .reel-foot {
-    display: flex;
-  }
+  .reel-foot { display: flex; }
+  .reel-media-inner { transition: none; }
 }
