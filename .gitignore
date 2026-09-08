@@ -4,3 +4,4 @@ dist
 .DS_Store
 .commandcode/
 qa-shots/
+.next/
