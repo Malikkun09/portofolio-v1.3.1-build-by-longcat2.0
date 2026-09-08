@@ -1,0 +1,58 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Satoshi font */
+@import url('https://api.fontshare.com/v2/css?f[]=satoshi@700,800,900&display=swap');
+
+/* Base styles */
+html {
+  background-color: #000000;
+  color: #F5F5F5;
+  scroll-behavior: auto;
+}
+
+body {
+  background-color: #000000;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Hide default cursor on desktop when custom cursor active */
+.cursor-none * {
+  cursor: none !important;
+}
+
+/* Selection styling */
+::selection {
+  background-color: #C8FF00;
+  color: #000000;
+}
+
+/* Focus visible styles */
+:focus-visible {
+  outline: 1px solid #C8FF00;
+  outline-offset: 2px;
+}
+
+/* Smooth clip-path transitions */
+.clip-reveal {
+  will-change: clip-path;
+}
+
+/* Video container */
+.video-container video {
+  object-fit: cover;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
