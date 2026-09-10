@@ -2,57 +2,143 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Satoshi font */
-@import url('https://api.fontshare.com/v2/css?f[]=satoshi@700,800,900&display=swap');
+:root {
+  --ink: #080807;
+  --field: #0c0c0b;
+  --paper: #e8e2d6;
+  --mist: #8f8a80;
+  --line: #22211c;
+  --brass: #c4a574;
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
+}
 
-/* Base styles */
+* {
+  box-sizing: border-box;
+}
+
 html {
-  background-color: #000000;
-  color: #F5F5F5;
+  background: var(--ink);
+  color: var(--paper);
   scroll-behavior: auto;
 }
 
 body {
-  background-color: #000000;
+  background: var(--ink);
+  color: var(--paper);
+  font-family: var(--font-sans), system-ui, sans-serif;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Hide default cursor on desktop when custom cursor active */
+::selection {
+  background: var(--brass);
+  color: var(--ink);
+}
+
+:focus-visible {
+  outline: 1px solid var(--brass);
+  outline-offset: 3px;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+img:not([data-nimg='fill']),
+video:not([data-media-video]) {
+  max-width: 100%;
+  height: auto;
+}
+
+img[data-nimg='fill'] {
+  max-width: none;
+  width: 100%;
+  height: 100%;
+}
+
+[data-media-frame] {
+  position: relative;
+  overflow: hidden;
+}
+
+html:not([data-ready]) #main {
+  opacity: 0;
+}
+
+.cursor-none,
 .cursor-none * {
   cursor: none !important;
 }
 
-/* Selection styling */
-::selection {
-  background-color: #C8FF00;
-  color: #000000;
+.frame {
+  width: min(100% - 2.5rem, 1680px);
+  margin-inline: auto;
 }
 
-/* Focus visible styles */
-:focus-visible {
-  outline: 1px solid #C8FF00;
-  outline-offset: 2px;
+@media (min-width: 768px) {
+  .frame {
+    width: min(100% - 4.5rem, 1680px);
+  }
 }
 
-/* Smooth clip-path transitions */
-.clip-reveal {
-  will-change: clip-path;
+.hairline {
+  height: 1px;
+  background: var(--line);
 }
 
-/* Video container */
-.video-container video {
-  object-fit: cover;
+.aperture {
+  position: relative;
+  isolation: isolate;
+  background: transparent;
+  border: 1px solid rgba(196, 165, 116, 0.28);
+  overflow: hidden;
 }
 
-/* Reduced motion */
+.aperture::after {
+  content: '';
+  position: absolute;
+  inset: 8px;
+  border: 1px solid rgba(232, 226, 214, 0.08);
+  pointer-events: none;
+}
+
+.section-kicker {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--mist);
+}
+
+.display {
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-weight: 800;
+  letter-spacing: -0.055em;
+  line-height: 0.82;
+  text-transform: uppercase;
+}
+
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
 @media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
+  html.lenis {
+    scroll-behavior: auto;
+  }
+
+  .aperture::after {
+    display: none;
   }
 }

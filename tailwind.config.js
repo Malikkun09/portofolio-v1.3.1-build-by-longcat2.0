@@ -1,31 +1,34 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
-    './src/pages/**/*.{js,ts,jsx,tsx,mdx}',
-    './src/components/**/*.{js,ts,jsx,tsx,mdx}',
-    './src/sections/**/*.{js,ts,jsx,tsx,mdx}',
-    './src/app/**/*.{js,ts,jsx,tsx,mdx}',
+    './src/app/**/*.{js,ts,jsx,tsx}',
+    './src/components/**/*.{js,ts,jsx,tsx}',
+    './src/sections/**/*.{js,ts,jsx,tsx}',
   ],
   theme: {
     extend: {
       colors: {
-        oled: {
-          black: '#000000',
-          border: '#1A1A1A',
-        },
-        primary: '#F5F5F5',
-        secondary: '#8A8A8A',
-        muted: '#555555',
-        accent: '#C8FF00',
+        ink: '#080807',
+        field: '#0C0C0B',
+        paper: '#E8E2D6',
+        mist: '#8F8A80',
+        line: '#22211C',
+        brass: '#C4A574',
       },
       fontFamily: {
-        satoshi: ['Satoshi', 'sans-serif'],
-        manrope: ['Manrope', 'sans-serif'],
-        avenir: ['"Avenir Next"', 'Avenir', 'system-ui', 'sans-serif'],
+        display: ['var(--font-display)', 'system-ui', 'sans-serif'],
+        sans: ['var(--font-sans)', 'system-ui', 'sans-serif'],
+        mono: ['var(--font-mono)', 'ui-monospace', 'monospace'],
       },
       letterSpacing: {
-        tightest: '-0.06em',
-        tighter: '-0.04em',
+        tightest: '-0.07em',
+        display: '-0.05em',
+      },
+      maxWidth: {
+        frame: '1680px',
+      },
+      transitionTimingFunction: {
+        expo: 'cubic-bezier(0.16, 1, 0.3, 1)',
       },
     },
   },

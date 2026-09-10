@@ -1,39 +1,36 @@
 'use client';
 
-import Lenis from '@studio-freight/lenis';
+import Lenis from 'lenis';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { prefersReducedMotion } from '@/lib/media';
 
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger);
 }
 
 let lenisInstance: Lenis | null = null;
+let tickerFn: ((time: number) => void) | null = null;
 
 export const initSmoothScroll = (): Lenis | null => {
   if (typeof window === 'undefined') return null;
-
-  // Don't init if reduced motion is preferred
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches)
-    return null;
+  if (prefersReducedMotion()) return null;
+  if (lenisInstance) return lenisInstance;
 
   lenisInstance = new Lenis({
-    duration: 1.2,
+    duration: 1.15,
     easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-    orientation: 'vertical',
-    gestureOrientation: 'vertical',
-    smoothWheel: true,
-    touchMultiplier: 2,
+    touchMultiplier: 1.4,
+    autoRaf: false,
   });
 
-  // Connect Lenis to GSAP ScrollTrigger
   lenisInstance.on('scroll', ScrollTrigger.update);
 
-  const raf = (time: number) => {
+  tickerFn = (time: number) => {
     lenisInstance?.raf(time * 1000);
   };
 
-  gsap.ticker.add(raf);
+  gsap.ticker.add(tickerFn);
   gsap.ticker.lagSmoothing(0);
 
   return lenisInstance;
@@ -42,25 +39,38 @@ export const initSmoothScroll = (): Lenis | null => {
 export const getLenis = () => lenisInstance;
 
 export const destroySmoothScroll = () => {
+  if (tickerFn) {
+    gsap.ticker.remove(tickerFn);
+    tickerFn = null;
+  }
   lenisInstance?.destroy();
   lenisInstance = null;
 };
 
-export const scrollTo = (target: string | number | HTMLElement) => {
+export const scrollTo = (
+  target: string | number | HTMLElement,
+  options?: { offset?: number }
+) => {
+  const offset = options?.offset ?? -20;
+
   if (lenisInstance) {
-    lenisInstance.scrollTo(target, { duration: 1.2 });
-  } else if (typeof window !== 'undefined') {
-    // Fallback for when Lenis isn't initialized (reduced motion)
-    const element =
-      typeof target === 'string'
-        ? document.querySelector(target)
-        : target instanceof HTMLElement
-          ? target
-          : null;
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
-    } else if (typeof target === 'number') {
-      window.scrollTo({ top: target, behavior: 'smooth' });
-    }
+    lenisInstance.scrollTo(target, { offset, duration: 1.15 });
+    return;
+  }
+
+  if (typeof window === 'undefined') return;
+
+  const element =
+    typeof target === 'string'
+      ? document.querySelector(target)
+      : target instanceof HTMLElement
+        ? target
+        : null;
+
+  if (element) {
+    const top = element.getBoundingClientRect().top + window.scrollY + offset;
+    window.scrollTo({ top, behavior: prefersReducedMotion() ? 'auto' : 'smooth' });
+  } else if (typeof target === 'number') {
+    window.scrollTo({ top: target, behavior: prefersReducedMotion() ? 'auto' : 'smooth' });
   }
 };
